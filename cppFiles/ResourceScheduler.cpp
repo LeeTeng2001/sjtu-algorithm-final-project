@@ -51,27 +51,36 @@ ResourceScheduler::ResourceScheduler(int tasktype, int caseID) {
 }
 
 void ResourceScheduler::schedule() {
+    // TODO: Implement your scheduling logic here
+    // TODO: Multiple host
+    // TODO: Single host
+
     vector<vector<int>> hostCoreBlock(numHost);
     for (int i = 0; i < numHost; i++)
         hostCoreBlock[i].resize(hostCore[i], 0);
 
     int hid, cid; // hostId, coreId
+
     for (int i = 0; i < numJob; i++) {
         set<pair<int, int>> allocatedJobCore;
         double jobDataSize = 0.0;
+
         for (int j = 0; j < jobBlock[i]; j++) {
             jobDataSize += dataSize[i][j];
-            if (g(allocatedJobCore.size() + 1) < 0) { // �ټ��º˵����ٶ�Ϊ��
-                set<pair<int, int>>::const_iterator position(allocatedJobCore.begin());
-                advance(position, rand() % allocatedJobCore.size()); // ���ȡһ���ѷ���˼��㵱ǰ���ݿ�
+
+            if (g(allocatedJobCore.size() + 1) < 0) { // speed decay can never be negative
+                auto position(allocatedJobCore.begin());
+                advance(position, rand() % allocatedJobCore.size()); // pick a random core
                 hid = position->first;
                 cid = position->second;
-            } else {
+            }
+            else {
                 hid = rand() % numHost;
                 cid = rand() % hostCore[hid];
                 allocatedJobCore.insert({hid, cid});
             }
-            runLoc[i][j] = make_tuple(hid, cid, ++hostCoreBlock[hid][cid]); // rank ��1��ʼ
+
+            runLoc[i][j] = make_tuple(hid, cid, ++hostCoreBlock[hid][cid]); // rank starts from 1
         }
 
         jobFinishTime[i] = jobDataSize / (Sc[i] * g(allocatedJobCore.size()));
