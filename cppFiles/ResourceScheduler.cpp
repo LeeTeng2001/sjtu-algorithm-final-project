@@ -1,4 +1,5 @@
 #include "../hFiles/ResourceScheduler.h"
+#include <queue>
 
 ResourceScheduler::ResourceScheduler(int tasktype, int caseID) {
     taskType = tasktype;
@@ -59,6 +60,16 @@ void ResourceScheduler::schedule() {
     for (int i = 0; i < numHost; i++)
         hostCoreBlock[i].resize(hostCore[i], 0);
 
+
+    // 1.
+
+
+
+
+
+
+
+    // hostCore[0] core num for host 0
     int hid, cid; // hostId, coreId
 
     for (int i = 0; i < numJob; i++) {
@@ -87,10 +98,12 @@ void ResourceScheduler::schedule() {
         jobCore[i] = allocatedJobCore.size();
     }
 
+
     for (int i = 0; i < numHost; i++) {
         for (int j = 0; j < hostCore[i]; j++) {
             int numTask = rand() % 10 + 1;
             hostCoreTask[i][j].resize(numTask);
+
             for (int k = 0; k < numTask; k++) {
                 int jid = rand() % numJob;
                 int bid = rand() % jobBlock[jid];
@@ -100,6 +113,7 @@ void ResourceScheduler::schedule() {
             }
         }
     }
+
 }
 
 

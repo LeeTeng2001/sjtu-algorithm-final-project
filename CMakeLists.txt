@@ -6,5 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(hFiles)
 file(GLOB SOURCES cppFiles/*.cpp)
 
+add_subdirectory("single core")
+
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES})

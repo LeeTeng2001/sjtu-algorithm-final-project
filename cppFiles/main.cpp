@@ -5,7 +5,7 @@
 int main() {
 	// Needs to ensure there is a file named "task_$taskType_case_$caseID.txt" in 'input' filefolder.
 	// You can test more cases if you want.
-	int taskType = 2, caseID = 1;
+	int taskType = 1, caseID = 1;
 
 	// Load data from file "task_$taskType_case_$caseID.txt" to class ResourceScheduler instance object.
 	ResourceScheduler rs(taskType, caseID); 
