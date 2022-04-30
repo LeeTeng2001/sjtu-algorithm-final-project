@@ -8,5 +8,7 @@ int main() {
 
     resScheduler.schedule();
     // cout << resScheduler.getFinishTimeDeviation() << '\n';
+
     resScheduler.printResultText();
+    resScheduler.exportData();
 }

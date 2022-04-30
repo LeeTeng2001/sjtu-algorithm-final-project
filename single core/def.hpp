@@ -81,4 +81,6 @@ public:
     void schedule();
 
     void printResultText();
+
+    void exportData();
 };

@@ -3,12 +3,13 @@
 #include <numeric>
 #include <queue>
 #include "def.hpp"
+#include "json.hpp"
 
 using std::cerr;
 using std::cout;
 using std::endl;
 using std::priority_queue;
-
+using std::fstream;
 
 ResourceScheduler::ResourceScheduler() {
     loadData();
@@ -155,5 +156,43 @@ void ResourceScheduler::printResultText() {
         cout << "Finish time deviation for host " << i << " = " << getFinishTimeDeviation(i) << '\n';
         cout << "Longest finish time for host " << i << " = " << getLongestFinishTime(i) << '\n';
     }
+}
+
+void ResourceScheduler::exportData() {
+    using nlohmann::json;
+    json jFile;
+    fstream saveFile("data-export.json", fstream::out | fstream::trunc);
+
+    for (int i = 0; i < totalHost; ++i) {
+        for (int j = 0; j < hostCore[i].size(); ++j) {
+            string id = "Host" + std::to_string(i) + "Core" + std::to_string(j);
+            // TODO: 1 based or 0 based?
+            jFile[id]["host"] = i + 1;
+            jFile[id]["core"] = j + 1;
+            jFile[id]["current"] = 0;
+
+            auto totalBlocks = hostCore[i][j].blocks.size();
+            for (int k = 0; k < totalBlocks; ++k) {
+                jFile[id]["deals"].push_back({
+                     {"job", hostCore[i][j].blocks[k].jobId},
+                     {"block", hostCore[i][j].blocks[k].jobBlockId},
+                     {"from", static_cast<int>(hostCore[i][j].blockInfos[k].startTime * 1000)},
+                     {"to", static_cast<int>(hostCore[i][j].blockInfos[k].endTime * 1000)},
+                });
+            }
+        }
+
+        // // Calculate host efficiency and other stats
+        // cout << "Finish time for each core: " << '\n';
+        //
+        // for (int j = 0; j < hostCore[i].size(); ++j) {
+        //     cout << "\tCore " << j << ": " << hostCore[i][j].getFinishTime() << '\n';
+        // }
+        //
+        // cout << "Finish time deviation for host " << i << " = " << getFinishTimeDeviation(i) << '\n';
+        // cout << "Longest finish time for host " << i << " = " << getLongestFinishTime(i) << '\n';
+    }
+
+    saveFile << jFile;
 }
 
