@@ -30,6 +30,7 @@ struct GeneratorConfig {
     int taskType;
     int caseID;
     bool writeToOutput;
+    bool printGeneratedData;
 };
 
 void generateTestCases(ResourceScheduler &rs, const GeneratorInfo &info, const GeneratorConfig &config) {
@@ -51,6 +52,8 @@ void generateTestCases(ResourceScheduler &rs, const GeneratorInfo &info, const G
     rs.hostCore.resize(rs.totalHost);
     rs.jobs.resize(rs.totalJob);
 
+    // Suspend output stream
+    if (!config.printGeneratedData) cout.setstate(std::ios::badbit);
     cout << "\n-----------Generator starts.--------------\n";
 
     cout << "numJob = " << rs.totalJob << ", numHost = " << rs.totalHost << ", alpha = " << rs.alpha;
@@ -101,11 +104,11 @@ void generateTestCases(ResourceScheduler &rs, const GeneratorInfo &info, const G
         }
         cout << "\n";
     }
+    cout << "\n\n-----------Generator ends.--------------\n\n";
+    if (!config.printGeneratedData) cout.clear();
 
     // Write output to file if specified
     writeTestCaseToFile(rs, config);
-
-    cout << "\n\n-----------Generator ends.--------------\n\n";
 }
 
 // Write to output if specified

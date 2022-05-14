@@ -2,8 +2,8 @@
 #include "def.hpp"
 
 int main() {
-    // type, caseID, write to output
-    GeneratorConfig config {1, 11, false};
+    // type, caseID, write to output, print generated data
+    GeneratorConfig config {1, 11, false, false};
     ResourceScheduler rs;  // placeholder
 
     // TODO: Generate test cases in different conditions
