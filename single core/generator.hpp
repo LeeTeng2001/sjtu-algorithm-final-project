@@ -32,18 +32,16 @@ struct GeneratorConfig {
     bool writeToOutput;
 };
 
-void writeTestCaseToFile(ResourceScheduler &rs, const GeneratorConfig& config);
-
 void generateTestCases(ResourceScheduler &rs, const GeneratorInfo &info, const GeneratorConfig &config) {
     // Random generator
     std::random_device dev;
     std::mt19937 rng(dev());
 
-    // Create range generator, [a, b)
-    std::uniform_int_distribution<int> gnCore(info.minCore, info.maxCore + 1);
-    std::uniform_int_distribution<int> gnBlock(info.minBlock, info.maxBlock + 1);
-    std::uniform_int_distribution<int> gnSize(info.minSize, info.maxSize + 1);
-    std::uniform_int_distribution<int> gnInitHostLocation(0, info.numHost);
+    // Create range generator, [a, b) for double, [a, b] for int
+    std::uniform_int_distribution<int> gnCore(info.minCore, info.maxCore);
+    std::uniform_int_distribution<int> gnBlock(info.minBlock, info.maxBlock);
+    std::uniform_int_distribution<int> gnSize(info.minSize, info.maxSize);
+    std::uniform_int_distribution<int> gnInitHostLocation(0, info.numHost - 1);
     std::uniform_real_distribution<double> gnSpeedJob(info.minJobSpeed, info.maxJobSpeed);
     std::uniform_real_distribution<double> gnSpeedTransfer(info.minTransferSpeed, info.maxTransferSpeed);
 

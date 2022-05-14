@@ -8,7 +8,7 @@ int main() {
 
     // TODO: Generate test cases in different conditions
 
-    // 1.
+    // 1
     GeneratorInfo g1 {
             // host, job, alpha
             1, 8, 0.05,
@@ -16,7 +16,7 @@ int main() {
             5, 6,
             1, 10,
             1, 10,
-            10, 20,
+            10, 19,
     };
     generateTestCases(rs, g1, config);
 }
