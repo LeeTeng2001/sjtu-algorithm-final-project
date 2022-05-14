@@ -9,15 +9,14 @@ using std::string;
 using std::ifstream;
 
 struct PerformanceReportSingleHost {
-    double fragmentTimeInternal;
-    double fragmentTimeEnd;
-    double totalRealProcessingTime;
-    double averageRealProcessingTime;
-    double averageFragmentTime;
-    double utilisationPercentage;
-
-    double longestFinishTime;
-    double finishTimeStd;
+    double fragmentTimeInternal = 0;  // internal idle time
+    double fragmentTimeEnd = 0;  // wait time to finish all process
+    double totalRealProcessingTime = 0;  // total processing time
+    double averageRealProcessingTime = 0;  // total processing time / cores
+    double averageFragmentTime = 0;  // total idle time / cores
+    double utilisationPercentage = 0;  // percentage of busy time
+    double longestFinishTime = 0;  // longest finish time
+    double finishTimeStd = 0;  // std of cores finish time
 };
 
 struct JobBlock {
