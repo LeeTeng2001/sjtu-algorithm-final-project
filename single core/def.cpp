@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <numeric>
 #include <queue>
@@ -12,6 +13,12 @@ using std::endl;
 using std::priority_queue;
 using std::fstream;
 using std::pair;
+
+// Manip
+using std::fixed;
+using std::setprecision;
+using std::setw;
+using std::left;
 
 constexpr double EPSILON = 0.000001;
 constexpr bool VERBOSE_REPORT = false;
@@ -310,22 +317,22 @@ void ResourceScheduler::printResultText(const string &evalTitle) {
             }
         }
 
-        // TODO: Calculate time efficiency
-
-        // Calculate host efficiency and other stats
+        // Print host efficiency and other interesting stats
         cout << "Finish time for each core: " << '\n';
-
         for (int j = 0; j < hostCore[i].size(); ++j) {
             cout << "\tCore " << j << ": " << hostCore[i][j].getFinishTime() << '\n';
         }
 
         PerformanceReportSingleHost performanceReport = evaluatePerformanceSingleHost();
 
-        cout << FGRN("Finish time deviation for host ") << i << " = " << performanceReport.finishTimeStd << '\n';
-        cout << FGRN("Longest finish time for host ") << i << " = " << performanceReport.longestFinishTime << "s\n";
-        cout << FGRN("Average idle time for host: ") << i << " = " << performanceReport.averageFragmentTime << "s\n";
-        cout << FGRN("Average process time for host: ") << i << " = " << performanceReport.averageRealProcessingTime << "s\n";
-        cout << FGRN("CPU utilisation for host: ") << i << " = " << performanceReport.utilisationPercentage << "%\n";
+        const int floatPrecision = 3;
+        const int textWidth = 32;
+        cout << FCYN("" << left << setw(textWidth) << "Performance info for host: ") << i << '\n';
+        cout << FGRN("" << left << setw(textWidth) << "Finish time deviation: ") << setprecision(floatPrecision) << fixed<< performanceReport.finishTimeStd << '\n';
+        cout << FGRN("" << left << setw(textWidth) << "Longest finish time: ") << setprecision(floatPrecision) << fixed<< performanceReport.longestFinishTime << "s\n";
+        cout << FGRN("" << left << setw(textWidth) << "Average process time: ") << setprecision(floatPrecision) << fixed<< performanceReport.averageRealProcessingTime << "s\n";
+        cout << FGRN("" << left << setw(textWidth) << "Average idle time: ") << setprecision(floatPrecision) << fixed<< performanceReport.averageFragmentTime << "s\n";
+        cout << FGRN("" << left << setw(textWidth) << "CPU utilisation: ") << setprecision(floatPrecision) << fixed<< performanceReport.utilisationPercentage << "%\n";
     }
 }
 
@@ -380,9 +387,9 @@ PerformanceReportSingleHost ResourceScheduler::evaluatePerformanceSingleHost() {
     }
 
     // Calculate utilisation percentage
-    report.utilisationPercentage = report.totalRealProcessingTime * 100 / (report.totalRealProcessingTime + report.fragmentTimeEnd + report.fragmentTimeInternal);
     report.averageFragmentTime = (report.fragmentTimeEnd + report.fragmentTimeInternal) / (double) hostCore[0].size();
     report.averageRealProcessingTime = report.totalRealProcessingTime / (double) hostCore[0].size();
+    report.utilisationPercentage = report.averageRealProcessingTime * 100 / (report.averageRealProcessingTime + report.averageFragmentTime);
 
     return report;
 }
