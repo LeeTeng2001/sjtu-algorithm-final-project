@@ -8,6 +8,18 @@ using std::vector;
 using std::string;
 using std::ifstream;
 
+struct PerformanceReportSingleHost {
+    double fragmentTimeInternal;
+    double fragmentTimeEnd;
+    double totalRealProcessingTime;
+    double averageRealProcessingTime;
+    double averageFragmentTime;
+    double utilisationPercentage;
+
+    double longestFinishTime;
+    double finishTimeStd;
+};
+
 struct JobBlock {
     int jobId; // belongs to nth job
     int jobBlockId;
@@ -97,6 +109,9 @@ private:
     vector<Core> splitJobBlocksToNCore(Job &job, int n);
     vector<Core> bruteForceMultiCore(const vector<Core> &cores, Job& job);
 
+    // Performance evaluation
+    PerformanceReportSingleHost evaluatePerformanceSingleHost();
+
 public:
     ResourceScheduler();
     void loadData(const string &path);  // load data from file path
@@ -107,6 +122,6 @@ public:
     // TODO: Algorithm for multiple hosts
 
     // Helper function for debug
-    void printResultText();
-    void exportData();
+    void printResultText(const string &evalTitle);
+    void exportData(const string &filePath);
 };

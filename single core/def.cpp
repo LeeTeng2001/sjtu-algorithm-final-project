@@ -14,9 +14,9 @@ using std::fstream;
 using std::pair;
 
 constexpr double EPSILON = 0.000001;
+constexpr bool VERBOSE_REPORT = false;
 
-ResourceScheduler::ResourceScheduler() {
-}
+ResourceScheduler::ResourceScheduler() = default;
 
 void ResourceScheduler::loadData(const string &path) {
     // TODO: Load file for mode 2
@@ -289,42 +289,50 @@ void ResourceScheduler::scheduleSingleHostLPTWithBFMulticores() {
 }
 
 
-void ResourceScheduler::printResultText() {
+void ResourceScheduler::printResultText(const string &evalTitle) {
+    cout << FCYN("--------Evaluating performance for method: " << evalTitle << "--------\n");
     for (int i = 0; i < totalHost; ++i) {
-        for (int j = 0; j < hostCore[i].size(); ++j) {
-            cout << "Host " << i << ", core" << j << '\n';
+        if (VERBOSE_REPORT) {
+            for (int j = 0; j < hostCore[i].size(); ++j) {
+                cout << "Host " << i << ", core" << j << '\n';
 
-            auto totalBlocks = hostCore[i][j].blocks.size();
-            for (int k = 0; k < totalBlocks; ++k) {
-                // print block info
-                cout << "\tjob = " << hostCore[i][j].blocks[k].jobId;
-                cout << ", block = " << hostCore[i][j].blocks[k].jobBlockId;
-                cout << ", size = " << hostCore[i][j].blocks[k].dataSize;
+                auto totalBlocks = hostCore[i][j].blocks.size();
+                for (int k = 0; k < totalBlocks; ++k) {
+                    // print block info
+                    cout << "\tjob = " << hostCore[i][j].blocks[k].jobId;
+                    cout << ", block = " << hostCore[i][j].blocks[k].jobBlockId;
+                    cout << ", size = " << hostCore[i][j].blocks[k].dataSize;
 
-                // print time
-                cout << "\tstart = " << hostCore[i][j].blockInfos[k].startTime;
-                cout << ", end =" << hostCore[i][j].blockInfos[k].endTime << '\n';
+                    // print time
+                    cout << "\tstart = " << hostCore[i][j].blockInfos[k].startTime;
+                    cout << ", end =" << hostCore[i][j].blockInfos[k].endTime << '\n';
+                }
             }
         }
 
         // TODO: Calculate time efficiency
 
         // Calculate host efficiency and other stats
-        cout << FRED("Finish time for each core: ") << '\n';
+        cout << "Finish time for each core: " << '\n';
 
         for (int j = 0; j < hostCore[i].size(); ++j) {
             cout << "\tCore " << j << ": " << hostCore[i][j].getFinishTime() << '\n';
         }
 
-        cout << FRED("Finish time deviation for host ") << i << " = " << getFinishTimeDeviation(hostCore[i]) << '\n';
-        cout << FRED("Longest finish time for host ") << i << " = " << getLongestFinishTime(hostCore[i]) << '\n';
+        PerformanceReportSingleHost performanceReport = evaluatePerformanceSingleHost();
+
+        cout << FGRN("Finish time deviation for host ") << i << " = " << performanceReport.finishTimeStd << '\n';
+        cout << FGRN("Longest finish time for host ") << i << " = " << performanceReport.longestFinishTime << "s\n";
+        cout << FGRN("Average idle time for host: ") << i << " = " << performanceReport.averageFragmentTime << "s\n";
+        cout << FGRN("Average process time for host: ") << i << " = " << performanceReport.averageRealProcessingTime << "s\n";
+        cout << FGRN("CPU utilisation for host: ") << i << " = " << performanceReport.utilisationPercentage << "%\n";
     }
 }
 
-void ResourceScheduler::exportData() {
+void ResourceScheduler::exportData(const string &filePath) {
     using nlohmann::json;
     json jFile;
-    fstream saveFile("data-export.json", fstream::out | fstream::trunc);
+    fstream saveFile(filePath, fstream::out | fstream::trunc);
 
     for (int i = 0; i < totalHost; ++i) {
         for (int j = 0; j < hostCore[i].size(); ++j) {
@@ -344,18 +352,38 @@ void ResourceScheduler::exportData() {
                 });
             }
         }
-
-        // // Calculate host efficiency and other stats
-        // cout << "Finish time for each core: " << '\n';
-        //
-        // for (int j = 0; j < hostCore[i].size(); ++j) {
-        //     cout << "\tCore " << j << ": " << hostCore[i][j].getFinishTime() << '\n';
-        // }
-        //
-        // cout << "Finish time deviation for host " << i << " = " << getFinishTimeDeviation(i) << '\n';
-        // cout << "Longest finish time for host " << i << " = " << getLongestFinishTime(i) << '\n';
     }
 
     saveFile << jFile;
+}
+
+PerformanceReportSingleHost ResourceScheduler::evaluatePerformanceSingleHost() {
+    PerformanceReportSingleHost report{};
+    report.finishTimeStd = getFinishTimeDeviation(hostCore[0]);
+    report.longestFinishTime = getLongestFinishTime(hostCore[0]);
+
+    // Calculate process time
+    for (int j = 0; j < hostCore[0].size(); ++j) {
+        auto totalBlocks = hostCore[0][j].blocks.size();
+        for (int k = 0; k < totalBlocks; ++k) {
+            // Check internal fragment/real processing time
+            auto processTime = hostCore[0][j].blockInfos[k].endTime - hostCore[0][j].blockInfos[k].startTime;
+            if (hostCore[0][j].blocks[k].jobId == -1)
+                report.fragmentTimeInternal += processTime;
+            else
+                report.totalRealProcessingTime += processTime;
+        }
+        // Check end fragment
+        if (abs(hostCore[0][j].getFinishTime() - report.longestFinishTime) > EPSILON) {
+            report.fragmentTimeEnd += abs(hostCore[0][j].getFinishTime() - report.longestFinishTime);
+        }
+    }
+
+    // Calculate utilisation percentage
+    report.utilisationPercentage = report.totalRealProcessingTime * 100 / (report.totalRealProcessingTime + report.fragmentTimeEnd + report.fragmentTimeInternal);
+    report.averageFragmentTime = (report.fragmentTimeEnd + report.fragmentTimeInternal) / (double) hostCore[0].size();
+    report.averageRealProcessingTime = report.totalRealProcessingTime / (double) hostCore[0].size();
+
+    return report;
 }
 

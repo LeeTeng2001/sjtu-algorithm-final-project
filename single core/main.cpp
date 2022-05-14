@@ -1,4 +1,3 @@
-#include <iostream>
 #include "def.hpp"
 
 using namespace std;
@@ -8,11 +7,12 @@ int main() {
 
     resScheduler.loadData("../../input/task1_case10.txt");
     resScheduler.scheduleSingleHostLPTOnly();
-    resScheduler.printResultText();
-    // // resScheduler.exportData();
+    resScheduler.printResultText("SingleHost LPT");
+    resScheduler.exportData("../../output/task1_case10-SingleHost-LPT.json");
 
     resScheduler.loadData("../../input/task1_case10.txt");
     resScheduler.scheduleSingleHostLPTWithBFMulticores();
-    resScheduler.printResultText();
+    resScheduler.printResultText("SingleHost Weighted");
+    resScheduler.exportData("../../output/task1_case10-SingleHost-MultiWeight.json");
 
 }
