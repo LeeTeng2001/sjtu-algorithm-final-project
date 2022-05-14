@@ -5,5 +5,5 @@
 
 void generator(ResourceScheduler &, int, int);
 
-void WriteData(string fileName, string text);
+void WriteData(const string& fileName, const string& text);
 

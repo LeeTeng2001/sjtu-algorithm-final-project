@@ -17,6 +17,10 @@ struct JobBlock {
         return dataSize < rhs.dataSize;
     };
 
+    bool operator>(const JobBlock &rhs) const {
+        return dataSize > rhs.dataSize;
+    };
+
     [[nodiscard]] double executionTime(int totalCore, double speed, double alpha) const {
         return dataSize / speed / (1 - alpha * (totalCore - 1));
     }
@@ -26,10 +30,19 @@ struct Job {
     int id{};
     int totalBlocks{};  // amount of blocks
     double speed{};
-
     vector<JobBlock> blocks;
 
+    // Extra info for single job sorting
     int totalSingleCoreExecTime = 0;
+
+    bool operator>(const Job &rhs) const {
+        return totalSingleCoreExecTime > rhs.totalSingleCoreExecTime;
+    };
+
+    bool operator<(const Job &rhs) const {
+        return totalSingleCoreExecTime < rhs.totalSingleCoreExecTime;
+    };
+
     void calculateSingleCoreExecTime() {
         for (const auto &item: blocks)
             totalSingleCoreExecTime += item.dataSize / speed;
@@ -58,6 +71,14 @@ struct Core {
     bool operator>(const Core &rhs) const {
         return getFinishTime() > rhs.getFinishTime();
     }
+
+    void recalculateExecInfo() {
+        for (int i = 1; i < blockInfos.size(); ++i) {
+            double blockExecTime = blockInfos[i].endTime - blockInfos[i].startTime;
+            blockInfos[i].startTime = blockInfos[i - 1].endTime;
+            blockInfos[i].endTime = blockInfos[i].startTime + blockExecTime;
+        }
+    }
 };
 
 class ResourceScheduler {
@@ -68,19 +89,24 @@ private:
     vector<vector<Core>> hostCore;   // the jth core for ith host
     vector<Job> jobs;  // job infos
 
-    void loadData();
-
     // double getFinishTime();
-    double getFinishTimeDeviation(int host);
-    double getLongestFinishTime(int host);
+    double getFinishTimeDeviation(const vector<Core> &cores);
+    double getLongestFinishTime(const vector<Core> &cores);
+
+    // Helper functions
+    vector<Core> splitJobBlocksToNCore(Job &job, int n);
+    vector<Core> bruteForceMultiCore(const vector<Core> &cores, Job& job);
 
 public:
     ResourceScheduler();
+    void loadData(const string &path);  // load data from file path
 
     // Main algorithm
-    void schedule();
+    void scheduleSingleHostLPTOnly();
+    void scheduleSingleHostLPTWithBFMulticores();  // BF = Brute Force
+    // TODO: Algorithm for multiple hosts
 
+    // Helper function for debug
     void printResultText();
-
     void exportData();
 };
