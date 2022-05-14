@@ -1,4 +1,5 @@
 #include "def.hpp"
+#include "generator.hpp"
 
 using namespace std;
 

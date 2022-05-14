@@ -4,4 +4,4 @@ cmake_minimum_required(VERSION 3.22)
 add_executable(single-core main.cpp def.hpp def.cpp)
 
 # Create executable for for generator
-add_executable(generator generator.cpp ResourceSchedulerOriginal.cpp)
+add_executable(generator-test-cases generator.hpp generator.cpp def.hpp def.cpp)

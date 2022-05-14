@@ -25,16 +25,16 @@ constexpr bool VERBOSE_REPORT = false;
 
 ResourceScheduler::ResourceScheduler() = default;
 
-void ResourceScheduler::loadData(const string &path) {
-    // TODO: Load file for mode 2
+void ResourceScheduler::loadData(const string &path, bool isMode2) {
     ifstream inputFile(path);
     if (!inputFile) {
         cerr << "Cannot open input file for path: " << path << endl;
         return;
     }
 
-    // Get total job, host and alpha
+    // Get total job, host and alpha, speed of transfer (2nd task)
     inputFile >> totalJob >> totalHost >> alpha;
+    if (isMode2) inputFile >> speedOfTransfer;
 
     // Initialise k cores for each host
     hostCore.resize(totalHost);
@@ -72,7 +72,12 @@ void ResourceScheduler::loadData(const string &path) {
         }
     }
 
-    // TODO: run loc?
+    // Initial host location for each job
+    for (int i = 0; i < totalJob; ++i) {
+        for (int j = 0; j < jobs[i].blocks.size(); ++j) {
+            inputFile >> jobs[i].blocks[j].initHostLocation;
+        }
+    }
 }
 
 double ResourceScheduler::getFinishTimeDeviation(const vector<Core> &cores) {
@@ -318,10 +323,10 @@ void ResourceScheduler::printResultText(const string &evalTitle) {
         }
 
         // Print host efficiency and other interesting stats
-        cout << "Finish time for each core: " << '\n';
-        for (int j = 0; j < hostCore[i].size(); ++j) {
-            cout << "\tCore " << j << ": " << hostCore[i][j].getFinishTime() << '\n';
-        }
+        // cout << "Finish time for each core: " << '\n';
+        // for (int j = 0; j < hostCore[i].size(); ++j) {
+        //     cout << "\tCore " << j << ": " << hostCore[i][j].getFinishTime() << '\n';
+        // }
 
         PerformanceReportSingleHost performanceReport = evaluatePerformanceSingleHost();
 

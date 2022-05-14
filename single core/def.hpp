@@ -23,6 +23,7 @@ struct JobBlock {
     int jobId; // belongs to nth job
     int jobBlockId;
     double dataSize;  // data size
+    int initHostLocation;  // initial host location
 
     bool operator<(const JobBlock &rhs) const {
         return dataSize < rhs.dataSize;
@@ -97,6 +98,7 @@ private:
     int totalJob{};  // total number of job
     int totalHost{}; // total number of host
     double alpha{};  // alpha for speed decay constant
+    double speedOfTransfer;  // transfer speed between different host
     vector<vector<Core>> hostCore;   // the jth core for ith host
     vector<Job> jobs;  // job infos
 
@@ -111,9 +113,13 @@ private:
     // Performance evaluation
     PerformanceReportSingleHost evaluatePerformanceSingleHost();
 
+    // Allow member access for benchmarking/data generator
+    friend void generateTestCases(ResourceScheduler &rs, const class GeneratorInfo &info, const class GeneratorConfig &config);
+    friend void writeTestCaseToFile(ResourceScheduler &rs, const class GeneratorConfig& config);
+
 public:
     ResourceScheduler();
-    void loadData(const string &path);  // load data from file path
+    void loadData(const string &path, bool isMode2 = false);  // load data from file path
 
     // Main algorithm
     void scheduleSingleHostLPTOnly();
