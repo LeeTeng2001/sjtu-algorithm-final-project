@@ -249,55 +249,10 @@ void ResourceScheduler::scheduleSingleHostLPTWithBFMulticores() {
         dummyCores = bruteForceMultiCore(dummyCores, job);
     }
 
-    // // Add core into min priority queue
-    // priority_queue<Core, vector<Core>, std::greater<>> priority(hostCore[host].begin(), hostCore[host].end());
-    //
-    // // Select min core, add all blocks to the core
-    // for (const auto &item: jobs) {
-    //     auto selectedCore = priority.top();
-    //     priority.pop();
-    //
-    //     for (const auto &jobBlock: item.blocks) {
-    //         BlockExecInfo execInfo{
-    //             selectedCore.getFinishTime(),
-    //             selectedCore.getFinishTime() + jobBlock.executionTime(1, item.speed, alpha)
-    //         };
-    //
-    //         selectedCore.blocks.push_back(jobBlock);
-    //         selectedCore.blockInfos.push_back(execInfo);
-    //     }
-    //
-    //     priority.push(selectedCore);
-    // }
-
     // put core back to result
     for (const auto &dummyCore: dummyCores) {
         hostCore[host][dummyCore.coreId] = dummyCore;
     }
-
-    // testing: multicore scheduling
-    // vector<Core> minFinishTimeCores = bruteForceMultiCore(hostCore[host], jobWithMaxBlock);
-    // cout << "Min finish time core size: " << minFinishTimeCores.size() << '\n';
-    //
-    // // TODO: Add at beginning
-    // // Currently it's adding at the back which is incorrect
-    // // Add partition job into each core
-    // for (const auto &partitionCore: minFinishTimeCores) {
-    //     auto &selectedCore = hostCore[host][partitionCore.coreId];
-    //
-    //     cout << "[Final] Partition core: " << partitionCore.coreId << ", finishtime: " << partitionCore.getFinishTime() << '\n';
-    //
-    //     double originalFinishTime = selectedCore.getFinishTime();
-    //     for (int i = 0; i < partitionCore.blocks.size(); ++i) {
-    //         BlockExecInfo execInfo{
-    //                 originalFinishTime + partitionCore.blockInfos[i].startTime,
-    //                 originalFinishTime + partitionCore.blockInfos[i].endTime
-    //         };
-    //
-    //         selectedCore.blocks.push_back(partitionCore.blocks[i]);
-    //         selectedCore.blockInfos.push_back(execInfo);
-    //     }
-    // }
 }
 
 
@@ -354,8 +309,12 @@ void ResourceScheduler::exportData(const string &filePath) {
             jFile[id]["core"] = j + 1;
             jFile[id]["current"] = 0;
 
+            // Process each non-idle block
             auto totalBlocks = hostCore[i][j].blocks.size();
             for (int k = 0; k < totalBlocks; ++k) {
+                if (hostCore[i][j].blocks[k].jobId == -1)
+                    continue;
+
                 jFile[id]["deals"].push_back({
                      {"job", hostCore[i][j].blocks[k].jobId},
                      {"block", hostCore[i][j].blocks[k].jobBlockId},
@@ -399,3 +358,6 @@ PerformanceReportSingleHost ResourceScheduler::evaluatePerformanceSingleHost() {
     return report;
 }
 
+void ResourceScheduler::scheduleMultiHostsNoTransmission() {
+
+}

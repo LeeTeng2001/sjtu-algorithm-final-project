@@ -158,5 +158,3 @@ void writeTestCaseToFile(ResourceScheduler &rs, const GeneratorConfig& config) {
         fs << "\n";
     }
 }
-
-

@@ -121,10 +121,13 @@ public:
     ResourceScheduler();
     void loadData(const string &path, bool isMode2 = false);  // load data from file path
 
-    // Main algorithm
+    // Algorithm for single host scheduling
     void scheduleSingleHostLPTOnly();
     void scheduleSingleHostLPTWithBFMulticores();  // BF = Brute Force
+
+    // Algorithm for multi hosts scheduling
     // TODO: Algorithm for multiple hosts
+    void scheduleMultiHostsNoTransmission();
 
     // Helper function for debug
     void printResultText(const string &evalTitle);
