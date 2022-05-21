@@ -10,7 +10,7 @@ using namespace std;
 int main() {
     ResourceScheduler resScheduler;
 
-    // // ! Test by reading data from test file
+    // ! Test by reading data from test file
     resScheduler.loadData("../../input/task1_case10.txt");
     resScheduler.scheduleSingleHostLPTOnly();
     resScheduler.printResultText("SingleHost LPT");
