@@ -359,21 +359,21 @@ PerformanceReportSingleHost ResourceScheduler::evaluatePerformanceSingleHost() {
 }
 
 void ResourceScheduler::scheduleMultiHostsNoTransmission() {
-    // Calculate total process time for single job in one core
-    for (auto &item: jobs)
-        item.calculateSingleCoreExecTime();
-
-    // Sort by longest single thread execution time
-    sort(jobs.begin(), jobs.end(), std::greater<>());
-
-    // Partition all by longest processing job
-    vector<Core> dummyCores = hostCore[host];
-    for (auto &job: jobs) {
-        dummyCores = bruteForceMultiCore(dummyCores, job);
-    }
-
-    // put core back to result
-    for (const auto &dummyCore: dummyCores) {
-        hostCore[host][dummyCore.coreId] = dummyCore;
-    }
+    // // Calculate total process time for single job in one core
+    // for (auto &item: jobs)
+    //     item.calculateSingleCoreExecTime();
+    //
+    // // Sort by longest single thread execution time
+    // sort(jobs.begin(), jobs.end(), std::greater<>());
+    //
+    // // Partition all by longest processing job
+    // vector<Core> dummyCores = hostCore[host];
+    // for (auto &job: jobs) {
+    //     dummyCores = bruteForceMultiCore(dummyCores, job);
+    // }
+    //
+    // // put core back to result
+    // for (const auto &dummyCore: dummyCores) {
+    //     hostCore[host][dummyCore.coreId] = dummyCore;
+    // }
 }
