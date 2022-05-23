@@ -157,7 +157,7 @@ vector<Core> ResourceScheduler::bruteForceMultiCore(const vector<Core> &cores, J
         // Fill cores with our new combination
         for (int j = 0; j < i; ++j) {
             // Add front sync padding
-            if (abs(newCores[j].getFinishTime() - syncTimeStart) > EPSILON) {
+            if (fabs(newCores[j].getFinishTime() - syncTimeStart) > EPSILON) {
                 newCores[j].blocks.push_back({-1, -1, -1});
                 newCores[j].blockInfos.push_back({newCores[j].getFinishTime(), syncTimeStart});
             }
@@ -172,7 +172,7 @@ vector<Core> ResourceScheduler::bruteForceMultiCore(const vector<Core> &cores, J
             }
 
             // Add back sync padding
-            if (abs(newCores[j].getFinishTime() - syncTimeEnd) > EPSILON) {
+            if (fabs(newCores[j].getFinishTime() - syncTimeEnd) > EPSILON) {
                 newCores[j].blocks.push_back({-1, -1, -1});
                 newCores[j].blockInfos.push_back({newCores[j].getFinishTime(), syncTimeEnd});
             }
@@ -345,8 +345,8 @@ PerformanceReportSingleHost ResourceScheduler::evaluatePerformanceSingleHost() {
                 report.totalRealProcessingTime += processTime;
         }
         // Check end fragment
-        if (abs(hostCore[0][j].getFinishTime() - report.longestFinishTime) > EPSILON) {
-            report.fragmentTimeEnd += abs(hostCore[0][j].getFinishTime() - report.longestFinishTime);
+        if (fabs(hostCore[0][j].getFinishTime() - report.longestFinishTime) > EPSILON) {
+            report.fragmentTimeEnd += fabs(hostCore[0][j].getFinishTime() - report.longestFinishTime);
         }
     }
 
