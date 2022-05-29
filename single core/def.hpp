@@ -110,9 +110,6 @@ private:
     vector<Core> splitJobBlocksToNCore(Job &job, int n);
     vector<Core> bruteForceMultiCore(const vector<Core> &cores, Job& job);
 
-    // Performance evaluation
-    PerformanceReportSingleHost evaluatePerformanceSingleHost();
-
     // Allow member access for benchmarking/data generator
     friend void generateTestCases(ResourceScheduler &rs, const class GeneratorInfo &info, const class GeneratorConfig &config);
     friend void writeTestCaseToFile(ResourceScheduler &rs, const class GeneratorConfig& config);
@@ -128,6 +125,9 @@ public:
     // Algorithm for multi hosts scheduling
     // TODO: Algorithm for multiple hosts
     void scheduleMultiHostsNoTransmission();
+
+    // Performance evaluation
+    PerformanceReportSingleHost evaluatePerformanceSingleHost();
 
     // Helper function for debug
     void printResultText(const string &evalTitle);

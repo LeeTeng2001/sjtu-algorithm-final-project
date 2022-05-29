@@ -140,7 +140,7 @@ vector<Core> ResourceScheduler::bruteForceMultiCore(const vector<Core> &cores, J
     sort(originalCores.begin(), originalCores.end());  // min finish time ... max finish time
 
     // Brute force try to find the most balanced partition (by weighted scores)
-    const double finishWeight = 1, splitBalanceWeight = 1;
+    const double finishWeight = 1.5, splitBalanceWeight = 1;
     double originalLongestFinishTime = originalCores.back().getFinishTime();
     vector<Core> minFinishTimeCores;
     double globMinPartitionScore = std::numeric_limits<double>::max();  // update at least 1 time
